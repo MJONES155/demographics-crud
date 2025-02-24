@@ -1,0 +1,142 @@
+<!DOCTYPE html> <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demographics Form</title>
+    <script>
+       
+       async function submitDemographic(event) {
+            event.preventDefault();
+            const form = document.getElementById('demographicsForm'); /*Get form*/
+            
+            let isValid = true;
+            /*Reset Messages*/
+            document.getElementById('firstnameError').innerText = '';
+            document.getElementById('lastnameError').innerText = '';
+            document.getElementById('emailError').innerText = '';
+            document.getElementById('cityError').innerText = '';
+            document.getElementById('ageError').innerText = '';
+
+            /*First Name Validation*/
+            const firstName=document.getElementById("firstname").value;
+            const namePattern = (/^[A-Za-z]+$/);
+            if (firstName.trim() === '') {
+                document.getElementById('firstnameError').innerText = 'First name is required';
+                isValid = false;
+            }
+            else if(!namePattern.test(firstName)) {
+            document.getElementById('firstnameError').innerText = 'First name must only contain letters'
+            isValid = false;
+            }
+            else if (firstName.length < 2) {
+            document.getElementById('firstnameError').innerText = 'Please enter at least 2 letters for first name';
+            isValid = false;
+            }
+    
+            /*Last Name Validation*/
+            const lastName=document.getElementById("lastname").value;
+            if (lastName.trim() === '') {
+                document.getElementById('lastnameError').innerText = 'Last name is required';
+                isValid = false;
+            }
+            else if(!namePattern.test(lastName)) {
+                document.getElementById('lastnameError').innerText = 'Last name must only contain letters'
+                isValid = false;
+            }
+            else if (lastName.length < 2) {
+                document.getElementById('lastnameError').innerText = 'Please enter at least 2 letters for last name';
+                isValid = false;
+            }
+
+            /*Age Validation*/
+            const age = document.getElementById('age').value;
+            if(age.trim() === '') {
+                document.getElementById('ageError').innerText = 'Age is required';
+                isValid = false;
+            }
+            else if(age < 0) {
+                document.getElementById('ageError').innerText = 'Enter a positive number';
+                isValid = false;
+            }
+
+            /*Email Validation*/
+            const email = document.getElementById("email").value;
+            const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+            if (email.trim() === '') {
+                document.getElementById('emailError').innerText ='Email is required';
+                isValid = false;
+            }
+            else if (!emailPattern.test(email)) {
+                document.getElementById('emailError').innerText ='Invalid email format';
+                isValid = false;
+            }
+            
+
+            /*City Validation*/
+            const city=document.getElementById("city").value;
+            if(city.trim() === '') {
+                document.getElementById('cityError').innerText ='City is required';
+                isValid = false;
+            }
+            else if (city.length < 2) {
+                document.getElementById('cityError').innerText = 'Please enter at least 2 letters for city';
+                isValid = false;
+            }
+            else if (!namePattern.test(city)) {
+                document.getElementById('cityError').innerText = 'City must only contain letters'
+                isValid = false;
+            }
+
+            /*Continues if valid*/
+            if (isValid){
+                const formData = new FormData(form);/*Creates new formData object*/
+                const data = Object.fromEntries(formData);/*Retrieves data*/
+                /*Sends data as JSON*/
+                const response = await fetch('/api/demographics', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message || 'Submitted successfully!'); /*Displays success message*/
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Demographics Form</h1>
+    <form id="demographicsForm" novalidate=true onsubmit="submitDemographic(event)" >
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstname" name="firstName" required>
+        <br><small id="firstnameError" style="color: red;"></small></br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastname" name="lastName" required>
+        <br><small id="lastnameError" style="color: red;"></small></br>
+
+        <label for="age">Age:</label>
+        <input type="number" name="age" id="age" min = 0 required>
+        <br><small id="ageError" style="color: red;"></small></br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+        <br><small id="emailError" style="color: red;"></small></br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="Not Specified">Prefer Not To Specify</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Other</option>
+        </select>
+        <br><small></small></br>
+
+        <label for="city">City:</label> <input type="text" id="city" name="city" required>
+        <br><small id="cityError" style="color: red;"></small></br>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
